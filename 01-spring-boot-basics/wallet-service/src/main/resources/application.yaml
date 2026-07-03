@@ -1,3 +1,18 @@
 spring:
   application:
     name: wallet-service
+server:
+  port: 8080
+  servlet:
+    context-path: /wallet
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+
+
+wallet:
+  currency: GBP
+  maximum-transfer: 5000
+  minimum-balance: 0
