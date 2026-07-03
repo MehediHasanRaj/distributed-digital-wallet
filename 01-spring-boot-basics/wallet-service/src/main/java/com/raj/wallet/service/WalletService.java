@@ -9,7 +9,7 @@ public class WalletService {
 
     public WalletResponse getWallet(Long id) {
 
-        return new WalletResponse(id, "Raj", 2500.0);
+        return new WalletResponse(id, "Raj", 2500);
 
     }
 

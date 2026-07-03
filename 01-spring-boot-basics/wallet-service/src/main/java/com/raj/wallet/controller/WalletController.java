@@ -3,6 +3,7 @@ package com.raj.wallet.controller;
 import com.raj.wallet.dto.request.CreateWalletRequest;
 import com.raj.wallet.dto.response.WalletResponse;
 import com.raj.wallet.service.WalletService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +26,7 @@ public class WalletController {
     }
 
     @PostMapping
-    public ResponseEntity<WalletResponse> createWallet(@RequestBody CreateWalletRequest request) {
+    public ResponseEntity<WalletResponse> createWallet(@Valid @RequestBody CreateWalletRequest request) {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(walletService.createWallet(request));
 
