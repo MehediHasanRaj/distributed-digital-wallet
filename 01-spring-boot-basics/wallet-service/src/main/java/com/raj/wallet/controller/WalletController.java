@@ -1,7 +1,9 @@
 package com.raj.wallet.controller;
 
-import com.raj.wallet.dto.Wallet;
+import com.raj.wallet.dto.request.CreateWalletRequest;
+import com.raj.wallet.dto.response.WalletResponse;
 import com.raj.wallet.service.WalletService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,13 +18,17 @@ public class WalletController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Wallet> getWallet(@PathVariable Long id) {
+    public ResponseEntity<WalletResponse> getWallet(@PathVariable Long id) {
+
         return ResponseEntity.ok(walletService.getWallet(id));
+
     }
 
     @PostMapping
-    public ResponseEntity<Wallet> createWallet(@RequestBody Wallet wallet) {
-        return ResponseEntity.status(201).body(wallet);
+    public ResponseEntity<WalletResponse> createWallet(@RequestBody CreateWalletRequest request) {
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(walletService.createWallet(request));
+
     }
 
 }
