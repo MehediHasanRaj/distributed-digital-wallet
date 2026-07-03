@@ -20,6 +20,7 @@ public class WalletController {
 
     @GetMapping("/{id}")
     public ResponseEntity<WalletResponse> getWallet(@PathVariable Long id) {
+        System.out.println("Getting wallet with id " + id);
 
         return ResponseEntity.ok(walletService.getWallet(id));
 
