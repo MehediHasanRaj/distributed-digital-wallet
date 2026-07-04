@@ -2,12 +2,16 @@ package com.raj.wallet.service;
 
 import com.raj.wallet.dto.request.CreateWalletRequest;
 import com.raj.wallet.dto.response.WalletResponse;
+import com.raj.wallet.entity.WalletEntity;
 import com.raj.wallet.exception.WalletNotFoundException;
 import com.raj.wallet.repository.WalletRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @Service
 public class WalletService {
@@ -22,22 +26,68 @@ public class WalletService {
         this.walletRepository = walletRepository;
     }
 
-    
-    public WalletResponse getWallet(Long id) {
-        if (id <= 0) {
-            logger.warn("Invalid wallet id received: {}", id);
-            throw new WalletNotFoundException(
-                    "Wallet with id " + id + " not found"
-            );
-        }
-        logger.info("Wallet {} fetched successfully", id);
-        return new WalletResponse(id, "Raj", 5000.00);
+    // create Wallet
+    public WalletResponse createWallet(CreateWalletRequest request) {
+
+        WalletEntity entity = mapToEntity(request);
+
+        WalletEntity saved = walletRepository.save(entity);
+
+        return mapToResponse(saved);
 
     }
 
-    public WalletResponse createWallet(CreateWalletRequest request) {
+//    find/get wallet
+    public WalletResponse getWallet(Long id) {
 
-        return new WalletResponse(1L, request.getOwner(), request.getBalance());
+        WalletEntity entity = walletRepository.findById(id).orElseThrow(() ->
+                                        new WalletNotFoundException("Wallet not found"));
+
+        return mapToResponse(entity);
+
+    }
+
+//    Find all wallet
+    public List<WalletResponse> getAllWallets() {
+        return walletRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+//    Update Wallet
+    public WalletResponse updateWallet(Long id, CreateWalletRequest request) {
+        WalletEntity entity = walletRepository.findById(id).orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
+
+        entity.setOwner(request.getOwner());
+        entity.setBalance(request.getBalance());
+
+        WalletEntity updated = walletRepository.save(entity);
+        return mapToResponse(updated);
+    }
+
+//    delete wallet
+    public void deleteWallet(Long id) {
+        WalletEntity entity = walletRepository.findById(id)
+                        .orElseThrow(() -> new WalletNotFoundException("Wallet not found"));
+
+        walletRepository.delete(entity);
+
+    }
+
+
+    private WalletEntity mapToEntity(CreateWalletRequest request) {
+
+        WalletEntity entity = new WalletEntity();
+        entity.setOwner(request.getOwner());
+        entity.setBalance(request.getBalance());
+
+        return entity;
+    }
+
+    private WalletResponse mapToResponse(WalletEntity entity) {
+
+        return new WalletResponse(entity.getId(), entity.getOwner(), entity.getBalance());
 
     }
 
