@@ -8,6 +8,9 @@ import com.raj.wallet.repository.WalletRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -73,6 +76,12 @@ public class WalletService {
 
         walletRepository.delete(entity);
 
+    }
+
+    //find by pageable
+    public Page<WalletResponse> getWallets(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return walletRepository.findAll(pageable).map(this::mapToResponse);
     }
 
 

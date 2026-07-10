@@ -4,6 +4,7 @@ import com.raj.wallet.dto.request.CreateWalletRequest;
 import com.raj.wallet.dto.response.WalletResponse;
 import com.raj.wallet.service.WalletService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -57,4 +58,15 @@ public class WalletController {
     }
 
 
+//    find peagable
+//    @GetMapping
+//    public ResponseEntity<Page<WalletResponse>> getAll(@RequestParam(defaultValue = "0") int page,
+//                                                       @RequestParam(defaultValue = "10") int size){
+//
+//        return ResponseEntity.ok(walletService.getWallets(page, size));
+//
+//    }
+
 }
+
+

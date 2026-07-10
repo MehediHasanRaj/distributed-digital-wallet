@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Date;
 
 @Entity
 @Table(name = "wallets")
@@ -25,6 +26,13 @@ public class WalletEntity {
 
     @Column(nullable = false)
     private BigDecimal balance;
+
+
+
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
 
 
 }
