@@ -2,9 +2,9 @@ CREATE TABLE wallets
 (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
 
-    wallet_id CHAR(36) NOT NULL UNIQUE,
+    wallet_id BINARY(16) NOT NULL UNIQUE,
 
-    user_id CHAR(36) NOT NULL,
+    user_id BINARY(16) NOT NULL,
 
     balance DECIMAL(19,2) NOT NULL,
 
