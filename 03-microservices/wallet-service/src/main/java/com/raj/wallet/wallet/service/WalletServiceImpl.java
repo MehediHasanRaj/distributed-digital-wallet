@@ -117,10 +117,8 @@ public class WalletServiceImpl implements WalletService {
 
     private Wallet findWallet(String walletId) {
 
-        return walletRepository.findByWalletId(
-                        UUID.fromString(walletId))
-                .orElseThrow(() ->
-                        new WalletNotFoundException(walletId));
+        return walletRepository.findByWalletId(UUID.fromString(walletId))
+                .orElseThrow(() -> new WalletNotFoundException(walletId));
     }
 
     private void validateActive(Wallet wallet) {
