@@ -7,10 +7,10 @@ spring:
     name: wallet-service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/walletdb
-    username: root
-    password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://mysql-db:3306/walletdb
+    username: walletuser
+    password: walletpass
+
 
   jpa:
     hibernate:
