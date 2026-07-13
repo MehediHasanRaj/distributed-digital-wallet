@@ -1,0 +1,5 @@
+cat > .dockerignore << 'EOF'
+.idea/
+.git/
+*.iml
+EOF
