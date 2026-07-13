@@ -1,6 +1,7 @@
 package com.raj.wallet.common.exception;
 
 import com.raj.wallet.wallet.exception.InsufficientBalanceException;
+import com.raj.wallet.wallet.exception.WalletAlreadyExistsException;
 import com.raj.wallet.wallet.exception.WalletFrozenException;
 import com.raj.wallet.wallet.exception.WalletNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -77,6 +78,16 @@ public class GlobalExceptionHandler {
                         message,
                         request.getRequestURI()
                 ));
+    }
+
+    @ExceptionHandler(WalletAlreadyExistsException.class)
+    public ResponseEntity<ApiErrorResponse>
+    handleWalletExists(WalletAlreadyExistsException ex, HttpServletRequest request){
+
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT)
+                .body(new ApiErrorResponse(Instant.now(), 409, "Wallet Already Exists", ex.getMessage(), request.getRequestURI()));
+
     }
 
 }

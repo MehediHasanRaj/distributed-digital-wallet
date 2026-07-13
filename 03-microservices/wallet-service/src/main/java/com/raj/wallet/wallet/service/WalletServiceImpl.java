@@ -1,5 +1,6 @@
 package com.raj.wallet.wallet.service;
 
+import com.raj.wallet.identity.client.IdentityFeignClient;
 import com.raj.wallet.wallet.dto.request.CreateWalletRequest;
 import com.raj.wallet.wallet.dto.request.DepositRequest;
 import com.raj.wallet.wallet.dto.request.WithdrawRequest;
@@ -7,6 +8,7 @@ import com.raj.wallet.wallet.dto.response.WalletResponse;
 import com.raj.wallet.wallet.entity.Wallet;
 import com.raj.wallet.wallet.enums.WalletStatus;
 import com.raj.wallet.wallet.exception.InsufficientBalanceException;
+import com.raj.wallet.wallet.exception.WalletAlreadyExistsException;
 import com.raj.wallet.wallet.exception.WalletFrozenException;
 import com.raj.wallet.wallet.exception.WalletNotFoundException;
 import com.raj.wallet.wallet.mapper.WalletMapper;
@@ -28,9 +30,20 @@ public class WalletServiceImpl implements WalletService {
     private final WalletRepository walletRepository;
     private final WalletMapper walletMapper;
 
+    //Openfegn client
+    private final IdentityFeignClient identityFeignClient;
+
     @Override
     @Transactional
     public WalletResponse createWallet(CreateWalletRequest request) {
+
+        //check user exist or not
+        identityFeignClient.getUser(request.userId());
+
+        //check wallet exist already or not
+        if(walletRepository.existsByUserId(request.userId())){
+            throw new WalletAlreadyExistsException(request.userId());
+        }
 
         log.info("Creating wallet for user {}", request.userId());
 

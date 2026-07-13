@@ -7,7 +7,7 @@ spring:
     name: wallet-service
 
   datasource:
-    url: jdbc:mysql://mysql-db:3306/walletdb
+    url: jdbc:mysql://localhost:3306/walletdb
     username: walletuser
     password: walletpass
 
@@ -38,3 +38,6 @@ logging:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+
+identity-service:
+  base-url: localhost://8081/api/v1
