@@ -1,5 +1,6 @@
 package com.raj.identity.user.service;
 
+import com.raj.identity.common.config.InstanceInformation;
 import com.raj.identity.user.dto.request.CreateUserRequest;
 import com.raj.identity.user.dto.response.UserResponse;
 import com.raj.identity.user.entity.User;
@@ -47,6 +48,13 @@ public class UserServiceImpl implements UserService {
         User saved = userRepository.save(user);
 
         log.info("User registered successfully: {}", saved.getUserId());
+
+        InstanceInformation instanceInformation = new InstanceInformation();
+        log.info(
+                "Identity Service [{}] processing user {}",
+                instanceInformation.getPort(),
+                saved.getUserId()
+        );
 
         return userMapper.toResponse(saved);
     }
