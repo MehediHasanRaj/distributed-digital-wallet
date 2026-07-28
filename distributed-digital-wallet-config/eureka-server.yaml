@@ -1,20 +1,11 @@
 server:
-  port: 8888
+  port: 8761
 
 spring:
   application:
-    name: config-server
+    name: eureka-server
 
-  cloud:
-    config:
-      server:
-        git:
-          uri: https://github.com/MehediHasanRaj/distributed-digital-wallet-config.git
-          default-label: main
-          clone-on-start: true
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
+eureka:
+  client:
+    register-with-eureka: false
+    fetch-registry: false
