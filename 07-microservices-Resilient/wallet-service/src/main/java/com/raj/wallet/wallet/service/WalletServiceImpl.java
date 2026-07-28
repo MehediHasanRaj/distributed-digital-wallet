@@ -13,6 +13,7 @@ import com.raj.wallet.wallet.exception.WalletFrozenException;
 import com.raj.wallet.wallet.exception.WalletNotFoundException;
 import com.raj.wallet.wallet.mapper.WalletMapper;
 import com.raj.wallet.wallet.repository.WalletRepository;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,12 @@ public class WalletServiceImpl implements WalletService {
 
     //Openfegn client
     private final IdentityFeignClient identityFeignClient;
+
+    // Adding Circuit breaker
+    @CircuitBreaker(
+            name = "identity-service",
+            fallbackMethod = "identityFallback"
+    )
 
     @Override
     @Transactional
