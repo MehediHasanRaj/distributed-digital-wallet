@@ -5,3 +5,5 @@ logging:
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/walletdb
+    username: walletuser
+    password: walletpass
