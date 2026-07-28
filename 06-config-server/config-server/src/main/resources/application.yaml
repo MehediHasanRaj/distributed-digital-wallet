@@ -9,7 +9,7 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/MehediHasanRaj/distributed-digital-wallet/tree/main/distributed-digital-wallet-config.git
+          uri: https://github.com/MehediHasanRaj/distributed-digital-wallet-config.git
           default-label: main
           clone-on-start: true
 
