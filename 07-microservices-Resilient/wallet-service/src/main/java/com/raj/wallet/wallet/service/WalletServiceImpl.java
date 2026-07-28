@@ -1,6 +1,7 @@
 package com.raj.wallet.wallet.service;
 
 import com.raj.wallet.identity.client.IdentityFeignClient;
+import com.raj.wallet.identity.dto.UserSummaryResponse;
 import com.raj.wallet.wallet.dto.request.CreateWalletRequest;
 import com.raj.wallet.wallet.dto.request.DepositRequest;
 import com.raj.wallet.wallet.dto.request.WithdrawRequest;
@@ -14,6 +15,7 @@ import com.raj.wallet.wallet.exception.WalletNotFoundException;
 import com.raj.wallet.wallet.mapper.WalletMapper;
 import com.raj.wallet.wallet.repository.WalletRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -34,11 +36,6 @@ public class WalletServiceImpl implements WalletService {
     //Openfegn client
     private final IdentityFeignClient identityFeignClient;
 
-    // Adding Circuit breaker
-    @CircuitBreaker(
-            name = "identity-service",
-            fallbackMethod = "identityFallback"
-    )
 
     @Override
     @Transactional
@@ -48,7 +45,7 @@ public class WalletServiceImpl implements WalletService {
         identityFeignClient.getUser(request.userId());
 
         //check wallet exist already or not
-        if(walletRepository.existsByUserId(request.userId())){
+        if (walletRepository.existsByUserId(request.userId())) {
             throw new WalletAlreadyExistsException(request.userId());
         }
 
@@ -63,6 +60,43 @@ public class WalletServiceImpl implements WalletService {
         log.info("Wallet {} created successfully", saved.getWalletId());
 
         return walletMapper.toResponse(saved);
+    }
+
+    // Adding Circuit breaker
+    @CircuitBreaker(
+            name = "identityService",
+            fallbackMethod = "identityFallback"
+    )
+    @Retry(
+            name = "identityRetry",
+            fallbackMethod = "retryFallback"
+    )
+    public UserSummaryResponse getUser(UUID userId) {
+
+        return identityFeignClient.getUser(userId);
+
+    }
+
+    private UserSummaryResponse retryFallback(UUID userId, Throwable exception
+    ) {
+        return new UserSummaryResponse(userId,
+                "Unknown",
+                "User",
+                null,
+                "SERVICE Retry Failed");
+    }
+
+    private UserSummaryResponse identityFallback(UUID userId, Throwable exception) {
+
+        return new UserSummaryResponse(
+                userId,
+                "Unknown",
+                "User",
+                "unavailable@example.com",
+                "SERVICE_UNAVAILABLE"
+
+        );
+
     }
 
     @Override
