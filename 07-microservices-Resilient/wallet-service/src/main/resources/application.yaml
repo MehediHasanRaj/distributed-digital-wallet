@@ -11,27 +11,44 @@ spring:
 
 
 resilience4j:
-  circuitbreaker:
+
+  ratelimiter:
     instances:
-      identityService:
-        slidingWindowType: COUNT_BASED
-        slidingWindowSize: 10
-        minimumNumberOfCalls: 5
-        failureRateThreshold: 50
-        waitDurationInOpenState: 10s
-        permittedNumberOfCallsInHalfOpenState: 3
-        automaticTransitionFromOpenToHalfOpenEnabled: true
+      walletRateLimiter:
+        limitForPeriod: 100
+        limitRefreshPeriod: 1s
+        timeoutDuration: 0
 
   retry:
     instances:
       identityRetry:
-        maxAttempts: 3
-        waitDuration: 2s
+        maxAttempts: 2
+        waitDuration: 500ms
         enableExponentialBackoff: true
         exponentialBackoffMultiplier: 2
-        retryExceptions:
-          - java.net.SocketTimeoutException
-          - java.io.IOException
+
+  timelimiter:
+    instances:
+      identityTimeout:
+        timeoutDuration: 2s
+        cancelRunningFuture: true
+
+  bulkhead:
+    instances:
+      identityBulkhead:
+        maxConcurrentCalls: 20
+        maxWaitDuration: 200ms
+
+  circuitbreaker:
+    instances:
+      identityCircuitBreaker:
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 15s
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
 
 
 

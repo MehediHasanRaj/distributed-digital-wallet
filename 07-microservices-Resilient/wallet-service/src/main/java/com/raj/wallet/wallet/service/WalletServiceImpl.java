@@ -14,8 +14,11 @@ import com.raj.wallet.wallet.exception.WalletFrozenException;
 import com.raj.wallet.wallet.exception.WalletNotFoundException;
 import com.raj.wallet.wallet.mapper.WalletMapper;
 import com.raj.wallet.wallet.repository.WalletRepository;
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Service
@@ -62,42 +66,43 @@ public class WalletServiceImpl implements WalletService {
         return walletMapper.toResponse(saved);
     }
 
+
+
+
+
     // Adding Circuit breaker
+    @RateLimiter(name = "walletRateLimiter")
+    @Retry(name = "identityRetry")
+    @TimeLimiter(name = "identityTimeout")
+    @Bulkhead(
+            name = "identityBulkhead",
+            type = Bulkhead.Type.THREADPOOL
+    )
     @CircuitBreaker(
-            name = "identityService",
+            name = "identityCircuitBreaker",
             fallbackMethod = "identityFallback"
     )
-    @Retry(
-            name = "identityRetry",
-            fallbackMethod = "retryFallback"
-    )
-    public UserSummaryResponse getUser(UUID userId) {
+    public CompletableFuture<UserSummaryResponse> getUser(UUID userId) {
 
-        return identityFeignClient.getUser(userId);
-
-    }
-
-    private UserSummaryResponse retryFallback(UUID userId, Throwable exception
-    ) {
-        return new UserSummaryResponse(userId,
-                "Unknown",
-                "User",
-                null,
-                "SERVICE Retry Failed");
-    }
-
-    private UserSummaryResponse identityFallback(UUID userId, Throwable exception) {
-
-        return new UserSummaryResponse(
-                userId,
-                "Unknown",
-                "User",
-                "unavailable@example.com",
-                "SERVICE_UNAVAILABLE"
-
+        return CompletableFuture.supplyAsync(() ->
+                identityFeignClient.getUser(userId)
         );
-
     }
+
+    private CompletableFuture<UserSummaryResponse> identityFallback(UUID userId,
+            Throwable throwable) {
+
+        return CompletableFuture.completedFuture(
+                new UserSummaryResponse(
+                        userId,
+                        "Identity Service Unavailable",
+                        "unknown",
+                        "mehedihasanraj.com",
+                        "unavailable"
+                )
+        );
+    }
+
 
     @Override
     public WalletResponse getWallet(String walletId) {
